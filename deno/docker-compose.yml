@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:latest
+    container_name: my-mongodb-container
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    command: mongod --bind_ip_all
+  mongo-express:
+    image: mongo-express:latest
+    container_name: my-mongo-express
+    env_file:
+      - .env
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+  app:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+      - .env
+    ports:
+      - '8089:8089'
+    volumes:
+      - .:/app
+      - app_data:/local
+volumes:
+  app_data:
+    driver: local
+  mongo-data:
